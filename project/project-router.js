@@ -8,7 +8,7 @@ const router = express.Router();
 //GET returns all of the project items
 router.get('/', async (req, res) => {
     try {
-        const projects = await Projects.get(req.query);
+        const projects = await Projects.get();
         res.status(200).json(projects);
     } catch (error) {
         console.log(error);
@@ -22,7 +22,7 @@ router.get('/:id', async (req, res) => {
     try {
         const project = await Projects.get(req.params.id);
         if (project.id == req.params.id) {
-            res.status(200).json(user)
+            res.status(200).json(project)
         } else {
             res.status(404).json({message: "Projects with that ID number can not be found"});
         }
@@ -37,7 +37,7 @@ router.get('/:id', async (req, res) => {
 router.get('/:id/actions', async (req, res) => {
     try {
         const projects = await Projects.getProjectActions(req.params.id);
-        if (projects) {
+        if (projects.length > 0) {
             res.status(200).json(projects)
         } else res.status(404).json({message: "Actions by that Project ID can not be found"});
     } catch {
@@ -49,10 +49,11 @@ router.get('/:id/actions', async (req, res) => {
 
 //Creates a new project
 router.post('/', async (req, res) => {
-    if (req.body.name == "" || req.body.description == "" || req.body.completed == "") {
+    if (req.body.name == null || req.body.description == null || req.body.name == "" || req.body.description == "") {
         res.status(400).json({errorMessage: "Please provide information in all fields"});
     } else {
         try {
+            console.log(req.body);
             const project = await Projects.insert(req.body);
             res.status(201).json(project)
         } catch {
@@ -74,7 +75,7 @@ router.put('/:id', async (req, res) => {
         }
     } catch (error) {
         console.log(error);
-        res.status(500).json({error: "The project could not be update"});
+        res.status(500).json({error: "The project could not be updated"});
     }
 });
 
